@@ -1,7 +1,5 @@
 const { AuthenticationError } = require('apollo-server-express');
-const { sign } = require('jsonwebtoken');
-const { Users, Books, User } = require('../models');
-const auth = require('../utils/auth');
+const { Book, User } = require('../models');
 const { signToken } = require('../utils/auth');
 
 const resolvers = {
@@ -31,6 +29,25 @@ const resolvers = {
 
             const token = signToken(user);
             return { token, user };
+        },
+
+        addUser: async (parent, args ) => {
+            const user = await User.create(args);
+            const token = signToken(user);
+
+            return { token, user };
+        },
+
+        saveBook: async (parent, { input }, context) => {
+            if(context.user){
+                const updtUser = await User.findByIdAndUpdate(
+                    { _id: context.user._id},
+                    { $addToSet: { saveBooks: input}},
+                    { new: true }
+                );
+                return updtUser;
+            }
+            throw new AuthenticationError('You should log in')
         },
     }
 };
