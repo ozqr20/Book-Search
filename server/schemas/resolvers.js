@@ -15,7 +15,7 @@ const resolvers = {
     },
 
     Mutation: {
-        login: async (parent, { email, password }) => {
+        loginUser: async (parent, { email, password }) => {
             const user = await User.findOne({ email });
 
             if (!user) {
@@ -49,6 +49,18 @@ const resolvers = {
             }
             throw new AuthenticationError('You should log in')
         },
+
+        removeBook: async (parent, args, context) => {
+            if(context.user){
+                const updtUser = await User.findByIdAndUpdate(
+                    { _id: context.user._id},
+                    { $pull: { savedBooks: {bookId: args.bookId}}},
+                    { new: true }
+                );
+                return updtUser;
+            }
+            throw new AuthenticationError('You should log in')
+        }
     }
 };
 
