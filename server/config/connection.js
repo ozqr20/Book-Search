@@ -1,10 +1,18 @@
 const mongoose = require('mongoose');
 
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/googlebooks', {
+const DB = process.env.DATABASE
+
+mongoose.connect(DB, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
   useFindAndModify: true
-});
+})
+  .then(() => {
+    console.log('Connected!')
+  })
+  .catch((error) => {
+    console.log(error.message)
+  })
 
-module.exports = mongoose.connection;
+//module.exports = mongoose.connection;
